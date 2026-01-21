@@ -1,0 +1,136 @@
+/* =========================================
+   1. IMPORTS & FONTS
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Font Utility Classes */
+.font-noto { font-family: 'Noto Sans Bengali', sans-serif; }
+.font-montserrat { font-family: 'Montserrat', sans-serif; }
+.font-poppins { font-family: 'Poppins', sans-serif; }
+
+/* =========================================
+   2. BASE STYLES
+   ========================================= */
+body {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar { 
+    width: 6px; 
+}
+::-webkit-scrollbar-track { 
+    background: #1e293b; 
+}
+::-webkit-scrollbar-thumb { 
+    background: #334155; 
+    border-radius: 3px; 
+}
+::-webkit-scrollbar-thumb:hover { 
+    background: #475569; 
+}
+
+/* =========================================
+   3. LOGIN PAGE STYLES
+   ========================================= */
+.bg-animate {
+    /* Green Dark Gradient Animation */
+    background: linear-gradient(135deg, #051e15 0%, #0f4d38 100%);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3); /* Darker overlay for readability */
+    z-index: 0;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Input Autofill Fix (Chrome/Safari) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.1) inset !important;
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* =========================================
+   4. TRACKER PAGE STYLES
+   ========================================= */
+.tracker-bg {
+    background-color: #0f172a; /* Dark Slate 900 */
+    overflow-x: hidden;
+}
+
+/* Breathing Animation for Titles */
+@keyframes breathe {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 1; 
+        text-shadow: 0 0 5px rgba(59, 130, 246, 0.2); 
+    }
+    50% { 
+        transform: scale(1.05); 
+        opacity: 0.9; 
+        text-shadow: 0 0 20px rgba(59, 130, 246, 0.6); 
+    }
+}
+.animate-breathe { 
+    animation: breathe 3s ease-in-out infinite; 
+}
+
+/* Watermark Background */
+.watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    font-size: 18vw;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.04);
+    pointer-events: none;
+    z-index: 0;
+    white-space: nowrap;
+    user-select: none;
+}
+
+/* =========================================
+   5. CHECKBOX STYLES
+   ========================================= */
+/* Main Checkbox Wrapper */
+.checkbox-wrapper input:checked + div,
+.sub-checkbox:checked + div {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
+/* Lesson Checkbox (for complex subjects like English) */
+.lesson-checkbox:checked + div {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
+.lesson-checkbox:checked + div svg { 
+    display: block; 
+}

@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syllabus Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Base Styles */
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Font Classes */
+        .font-noto { font-family: 'Noto Sans Bengali', sans-serif; }
+        .font-montserrat { font-family: 'Montserrat', sans-serif; }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+
+        /* --- Login Page Styles --- */
+        .bg-animate {
+            /* Green Dark Gradient Animation */
+            background: linear-gradient(135deg, #051e15 0%, #0f4d38 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            position: fixed; /* Fixed to cover viewport */
+            top: 0; left: 0; right: 0; bottom: 0;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .bg-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3); /* Slightly darker overlay for better text readability */
+            z-index: 0;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        /* Input Autofill Fix */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active{
+            -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.1) inset !important;
+            -webkit-text-fill-color: white !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* --- Tracker Page Styles --- */
+        .tracker-bg {
+            background-color: #0f172a; /* Dark Slate 900 */
+            overflow-x: hidden;
+        }
+
+        /* Animation In-Out */
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 1; text-shadow: 0 0 5px rgba(59, 130, 246, 0.2); }
+            50% { transform: scale(1.05); opacity: 0.9; text-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+        }
+        .animate-breathe { animation: breathe 3s ease-in-out infinite; }
+
+        /* Custom Checkbox */
+        .checkbox-wrapper input:checked + div,
+        .sub-checkbox:checked + div {
+            background-color: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+        /* Specific style for MCQ to make it distinct if needed, currently same blue */
+        
+        .lesson-checkbox:checked + div {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+        .lesson-checkbox:checked + div svg { display: block; }
+
+        /* Watermark */
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 18vw;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.04);
+            pointer-events: none;
+            z-index: 0;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body id="main-body">
+
+    <!-- ================= LOGIN VIEW ================= -->
+    <div id="login-view" class="bg-animate w-full h-screen flex items-center justify-center relative overflow-hidden text-white font-poppins hidden">
+        
+        <!-- Dark overlay -->
+        <div class="bg-overlay"></div>
+
+        <!-- Login Container -->
+        <div class="glass-card relative z-10 w-full max-w-[400px] p-8 rounded-2xl mx-4 sm:mx-0 flex flex-col items-center">
+            
+            <!-- Animated Title -->
+            <div class="text-center mb-6">
+                <h1 class="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400 font-montserrat animate-breathe tracking-wider">
+                    STUDY TRACKER
+                </h1>
+                <p class="text-xs text-slate-300 font-medium tracking-[0.2em] mt-2 opacity-80 uppercase">
+                    by MUJAHID
+                </p>
+            </div>
+
+            <!-- Header -->
+            <h2 class="text-xl font-semibold mb-6 tracking-wide text-white/90">Login to Continue</h2>
+
+            <form id="loginForm" class="w-full space-y-6" onsubmit="handleLogin(event)">
+                
+                <!-- Email Input -->
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-300 group-focus-within:text-white transition-colors duration-300">
+                        <i data-lucide="mail" class="w-5 h-5"></i>
+                    </div>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        required
+                        class="block w-full pl-10 pr-3 py-3 bg-transparent border-b border-gray-400 focus:border-white text-white placeholder-gray-300 focus:outline-none transition-colors duration-300"
+                        placeholder="Email"
+                    >
+                </div>
+
+                <!-- Password Input -->
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-300 group-focus-within:text-white transition-colors duration-300">
+                        <i data-lucide="lock" class="w-5 h-5"></i>
+                    </div>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        required
+                        class="block w-full pl-10 pr-10 py-3 bg-transparent border-b border-gray-400 focus:border-white text-white placeholder-gray-300 focus:outline-none transition-colors duration-300"
+                        placeholder="Password"
+                    >
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer text-gray-300 hover:text-white transition-colors" onclick="togglePassword()">
+                        <i data-lucide="eye" id="eyeIcon" class="w-5 h-5"></i>
+                    </div>
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between text-sm">
+                    <label class="flex items-center cursor-pointer select-none group">
+                        <div class="relative">
+                            <input type="checkbox" class="peer sr-only" id="remember" checked>
+                            <div class="w-4 h-4 border border-gray-300 rounded group-hover:border-white peer-checked:bg-white peer-checked:border-white transition-colors"></div>
+                            <i data-lucide="check" class="w-3 h-3 text-black absolute top-0.5 left-0.5 hidden peer-checked:block pointer-events-none"></i>
+                        </div>
+                        <span class="ml-2 text-gray-200 group-hover:text-white transition-colors">Remember me</span>
+                    </label>
+                    <a href="#" class="text-gray-200 hover:text-white font-medium hover:underline transition-colors">Forgot Password?</a>
+                </div>
+
+                <!-- Login Button -->
+                <button 
+                    type="submit" 
+                    id="loginBtn"
+                    class="w-full py-3 px-4 bg-white text-gray-900 font-bold rounded-full shadow-lg hover:bg-opacity-90 active:scale-95 transition-all duration-200 mt-4"
+                >
+                    Log In
+                </button>
+
+                <!-- Register Link -->
+                <div class="text-center text-sm text-gray-200 mt-6">
+                    Don't have an account? 
+                    <a href="#" class="font-bold text-white hover:underline ml-1">Register</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Notification Toast -->
+        <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+            <div class="bg-white text-gray-800 px-6 py-3 rounded-lg shadow-xl flex items-center gap-3 border-l-4 border-green-500">
+                <i data-lucide="check-circle" class="text-green-500"></i>
+                <div>
+                    <h4 class="font-bold text-sm">Success</h4>
+                    <p class="text-xs text-gray-600">Logged in successfully!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= TRACKER VIEW ================= -->
+    <div id="tracker-view" class="w-full min-h-screen flex flex-col items-center py-6 px-4 tracker-bg text-white font-noto hidden">
+        
+        <!-- Watermark Background -->
+        <div class="watermark">MUJAHID</div>
+
+        <!-- Main Container -->
+        <div class="w-full max-w-md space-y-6 relative z-10">
+            
+            <!-- Header Section -->
+            <div class="flex flex-col items-center justify-center pt-2 pb-4">
+                <h1 class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400 font-montserrat animate-breathe tracking-wider text-center">
+                    SYLLABUS TRACKER
+                </h1>
+                <div class="flex items-center gap-2 text-slate-400 text-sm mt-1 font-medium bg-slate-800/50 px-3 py-1 rounded-full border border-slate-700/50">
+                    <span>📘</span> 
+                    <span>সিলেবাস ট্র্যাকার</span>
+                </div>
+                <!-- User Info -->
+                <div class="mt-2 text-xs text-slate-500 font-poppins">
+                    User: <span id="user-display" class="text-blue-400"></span> 
+                    <button onclick="logout()" class="ml-2 text-red-400 hover:text-red-300 underline cursor-pointer">Logout</button>
+                </div>
+            </div>
+
+            <!-- Subject Selection Grid -->
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="selectSubject('bangla')" id="btn-bangla" class="subject-btn p-4 rounded-xl bg-slate-800 border-2 border-slate-700 text-center shadow-lg transition hover:bg-slate-700">
+                    <div class="text-3xl mb-2">📝</div>
+                    <div class="font-semibold text-sm">বাংলা</div>
+                </button>
+                <button onclick="selectSubject('english')" id="btn-english" class="subject-btn p-4 rounded-xl bg-slate-800 border-2 border-slate-700 text-center shadow-lg transition hover:bg-slate-700">
+                    <div class="text-3xl mb-2">🅰️</div>
+                    <div class="font-semibold text-sm">English</div>
+                </button>
+                <button onclick="selectSubject('ict')" id="btn-ict" class="subject-btn p-4 rounded-xl bg-slate-800 border-2 border-slate-700 text-center shadow-lg transition hover:bg-slate-700 col-span-2 sm:col-span-1">
+                    <div class="text-3xl mb-2">💻</div>
+                    <div class="font-semibold text-sm">আইসিটি</div>
+                </button>
+                <button onclick="selectSubject('logic')" id="btn-logic" class="subject-btn p-4 rounded-xl bg-blue-600 border-2 border-transparent text-center shadow-lg transition hover:opacity-90">
+                    <div class="text-3xl mb-2">🧩</div>
+                    <div class="font-semibold text-sm">যুক্তিবিদ্যা</div>
+                </button>
+                <button onclick="selectSubject('economics')" id="btn-economics" class="subject-btn p-4 rounded-xl bg-slate-800 border-2 border-slate-700 text-center shadow-lg transition hover:bg-slate-700">
+                    <div class="text-3xl mb-2">📊</div>
+                    <div class="font-semibold text-sm">অর্থনীতি</div>
+                </button>
+                <button onclick="selectSubject('civics')" id="btn-civics" class="subject-btn p-4 rounded-xl bg-slate-800 border-2 border-slate-700 text-center shadow-lg transition hover:bg-slate-700">
+                    <div class="text-3xl mb-2">⚖️</div>
+                    <div class="font-semibold text-sm">পৌরনীতি</div>
+                </button>
+                <button onclick="selectSubject('sociology')" id="btn-sociology" class="subject-btn p-4 rounded-xl bg-slate-800 border-2 border-slate-700 text-center shadow-lg transition hover:bg-slate-700 col-span-2">
+                    <div class="text-3xl mb-2">🏘️</div>
+                    <div class="font-semibold text-sm">সমাজবিজ্ঞান</div>
+                </button>
+            </div>
+
+            <hr class="border-slate-700 opacity-50">
+
+            <!-- Paper Selection Tabs -->
+            <div id="paper-tabs-container" class="flex gap-3 bg-slate-900/50 p-1 rounded-xl">
+                <button onclick="selectPaper(1)" id="tab-1" class="flex-1 py-2 px-4 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 transition text-sm">1st Paper</button>
+                <button onclick="selectPaper(2)" id="tab-2" class="flex-1 py-2 px-4 rounded-lg bg-blue-600 text-white font-medium shadow-lg transition text-sm">2nd Paper</button>
+            </div>
+
+            <!-- Content Area -->
+            <div>
+                <!-- Title & Status -->
+                <div class="flex flex-col gap-4 mb-4">
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col">
+                            <span class="text-xs text-slate-400 uppercase tracking-wider font-semibold" id="section-paper-label">1st Paper</span>
+                            <h2 class="text-xl font-bold text-white leading-tight" id="section-title">বাংলা</h2>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="markAll(true)" class="bg-green-600/20 hover:bg-green-600/30 text-green-400 border border-green-600/50 text-[10px] px-3 py-1.5 rounded-full transition font-medium">সব শেষ</button>
+                            <button onclick="markAll(false)" class="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-600/50 text-[10px] px-3 py-1.5 rounded-full transition font-medium">রিসেট</button>
+                        </div>
+                    </div>
+
+                    <!-- Completed Count Widget -->
+                    <div class="bg-slate-800/60 rounded-lg p-3 flex items-center justify-between border border-slate-700/50">
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-400 text-lg">✅</span>
+                            <span class="text-sm font-medium text-slate-300">সম্পন্ন অধ্যায়:</span>
+                        </div>
+                        <div class="flex items-center bg-slate-900 rounded-lg px-3 py-1.5 border border-slate-700">
+                            <span id="completed-count" class="text-white font-bold text-sm tracking-wide">0 / 0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-800 h-3 rounded-full mb-6 overflow-hidden border border-slate-700">
+                    <div id="progress-bar" class="bg-gradient-to-r from-blue-500 to-cyan-400 h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                </div>
+
+                <!-- Chapter List -->
+                <div id="chapter-list" class="space-y-3 pb-8">
+                    <!-- Content injected via JS -->
+                </div>
+
+                <!-- Copyright Footer -->
+                <div class="text-center text-slate-600 text-xs font-medium pt-8 pb-4">
+                    Copyright © Mujahid
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Authentication Logic ---
+        const ACTIVE_USER_KEY = 'syllabus_active_user';
+        let currentUser = localStorage.getItem(ACTIVE_USER_KEY);
+        let progressData = {}; // Will load after auth
+
+        // Initial Auth Check
+        function checkAuth() {
+            if (currentUser) {
+                showTracker();
+            } else {
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            document.getElementById('login-view').classList.remove('hidden');
+            document.getElementById('tracker-view').classList.add('hidden');
+            // Re-initialize icons for login view
+            lucide.createIcons();
+        }
+
+        function showTracker() {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('tracker-view').classList.remove('hidden');
+            document.getElementById('user-display').innerText = currentUser;
+            
+            // Load Data Specific to User
+            loadUserData();
+            initTracker(); 
+        }
+
+        function loadUserData() {
+            // Use a unique key for each user
+            const storageKey = `syllabusTrackerData_${currentUser}`;
+            progressData = JSON.parse(localStorage.getItem(storageKey)) || {};
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const btn = document.getElementById('loginBtn');
+            const originalText = btn.innerText;
+
+            // Loading state
+            btn.innerHTML = '<span class="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2"></span> Logging in...';
+            btn.disabled = true;
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+
+            setTimeout(() => {
+                // Show Success Toast
+                showToast();
+                
+                setTimeout(() => {
+                    // Set User and Switch View
+                    currentUser = email;
+                    localStorage.setItem(ACTIVE_USER_KEY, email);
+                    
+                    // Reset Button
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-70', 'cursor-not-allowed');
+                    
+                    showTracker();
+                }, 1000);
+            }, 1000);
+        }
+
+        function logout() {
+            localStorage.removeItem(ACTIVE_USER_KEY);
+            currentUser = null;
+            location.reload(); // Simple reload to reset state
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // --- Tracker Data & Logic ---
+        const syllabusData = {
+            bangla: {
+                name: "বাংলা",
+                papers: {
+                    1: [
+                        "SECTION:গদ্য",
+                        "গদ্য-১: বাঙ্গালার নব্য লেখকদিগের প্রতি নিবেদন - বঙ্কিমচন্দ্র চট্টোপাধ্যায়",
+                        "গদ্য-২: অপরিচিতা - রবীন্দ্রনাথ ঠাকুর",
+                        "গদ্য-৩: সাহিত্যে খেলা - প্রমথ চৌধুরী",
+                        "গদ্য-৪: বিলাসী - শরৎচন্দ্র চট্টোপাধ্যায়",
+                        "গদ্য-৫: অর্ধাঙ্গী - রোকেয়া সাখাওয়াত হোসেন",
+                        "গদ্য-৬: যৌবনের গান - কাজী নজরুল ইসলাম",
+                        "গদ্য-৭: জীবন ও বৃক্ষ - মোতাহের হোসেন চৌধুরী",
+                        "গদ্য-৮: গন্তব্য কাবুল - সৈয়দ মুজতবা আলী",
+                        "গদ্য-৯: মাসি-পিসি - মানিক বন্দ্যোপাধ্যায়",
+                        "গদ্য-১০: কপিলদাস মুর্মুর শেষ কাজ - শওকত আলী",
+                        "গদ্য-১১: রেইনকোট - আখতারুজ্জামান ইলিয়াস",
+                        "গদ্য-১২: নেকলেস - গী দ্য মোপাসাঁ",
+                        "SECTION:পদ্য",
+                        "পদ্য-১: ঋতু-বর্ণন - আলাওল",
+                        "পদ্য-২: বিভীষণের প্রতি মেঘনাদ - মাইকেল মধুসূদন দত্ত",
+                        "পদ্য-৩: সোনার তরী - রবীন্দ্রনাথ ঠাকুর",
+                        "পদ্য-৪: বিদ্রোহী - কাজী নজরুল ইসলাম",
+                        "পদ্য-৫: সুচেতনা - জীবনানন্দ দাশ",
+                        "পদ্য-৬: প্রতিদান - জসীমউদ্‌দীন",
+                        "পদ্য-৭: তাহারেই পড়ে মনে - সুফিয়া কামাল",
+                        "পদ্য-৮: পদ্মা - ফরুখ আহমদ",
+                        "পদ্য-৯: ফেব্রুয়ারি ১৯৬৯ - শামসুর রাহমান",
+                        "পদ্য-১০: আঠার বছর বয়স - সুকান্ত ভট্টাচার্য",
+                        "পদ্য-১১: আমি কিংবদন্তির কথা বলছি - আবু জাফর ওবায়দুল্লাহ্",
+                        "পদ্য-১২: প্রত্যাবর্তনের লজ্জা - আল মাহমুদ",
+                        "SECTION:সহপাঠ",
+                        "উপন্যাস: লালসালু - সৈয়দ ওয়ালীউল্লাহ",
+                        "নাটক: সিরাজউদ্দৌলা - সিকান্দার আবু জাফর"
+                    ],
+                    2: [
+                        "অধ্যায় ০১: উচ্চারণের নিয়ম", "অধ্যায় ০২: বাংলা বানানের নিয়ম", "অধ্যায় ০৩: ব্যাকরণিক শব্দশ্রেণি", "অধ্যায় ০৪: বাংলা শব্দগঠন (উপসর্গ, প্রত্যয়, সমাস)", 
+                        "অধ্যায় ০৫: বাক্যতত্ত্ব", "অধ্যায় ০৬: বাংলা ভাষার অপপ্রয়োগ ও শুদ্ধপ্রয়োগ", "অধ্যায় ০৭: পারিভাষিক শব্দ ও অনুবাদ", "অধ্যায় ০৮: দিনলিপি ও প্রতিবেদন", 
+                        "অধ্যায় ০৯: বৈদ্যুতিক চিঠি ও আবেদনপত্র", "অধ্যায় ১০: সারাংশ ও সারমর্ম", "অধ্যায় ১১: ভাবসম্প্রসারণ", "অধ্যায় ১২: প্রবন্ধ রচনা"
+                    ]
+                }
+            },
+            english: {
+                name: "English",
+                papers: {
+                    1: [
+                        {
+                            title: "Unit One: Education and Life",
+                            lessons: ["Lesson 1: The Parrot's Tale", "Lesson 2: Education and Technology", "Lesson 3: Children in School", "Lesson 4: Civic Engagement"]
+                        },
+                        {
+                            title: "Unit Two: Art and Craft",
+                            lessons: ["Lesson 1: What is Beauty?", "Lesson 2: Folk Music", "Lesson 3: Art", "Lesson 4: Craft"]
+                        },
+                        {
+                            title: "Unit Three: Myths and Literature",
+                            lessons: ["Lesson 1: Myths of Bengal", "Lesson 2: Icarus", "Lesson 3: The Legend of Gazi", "Lesson 4: Khona"]
+                        },
+                        {
+                            title: "Unit Four: History",
+                            lessons: ["Lesson 1: Three Speeches", "Lesson 2: Great Women"]
+                        },
+                        {
+                            title: "Unit Five: Human Rights",
+                            lessons: ["Lesson 1: Are We Aware of These Rights-I?", "Lesson 2: Are We Aware of These Rights-II?", "Lesson 3: Rights to Health and Education", "Lesson 4: Coal Miners", "Lesson 5: Frederick Douglass"]
+                        },
+                        {
+                            title: "Unit Six: Dreams",
+                            lessons: ["Lesson 1: What is a Dream?", "Lesson 2: Dreams in Literature"]
+                        },
+                        {
+                            title: "Unit Seven: Youthful Achievers",
+                            lessons: ["Lesson 1: Brojen Das: On Crossing the English Channel", "Lesson 2: Scaling a Mountain Peak", "Lesson 3: The Unbeaten Girls"]
+                        },
+                        {
+                            title: "Unit Eight : Relationships",
+                            lessons: ["Lesson 1: Family Relationship", "Lesson 2: Warmth in Relationships", "Lesson 3: A Mother in Mannville", "Lesson 4: Love"]
+                        },
+                        {
+                            title: "Unit Nine: Adolescence",
+                            lessons: ["Lesson 1: Storm and Stresses of Adolescence", "Lesson 2: Adolescence and Some (Related) Problems in Bangladesh", "Lesson 3: The Story of Shilpi", "Lesson 4: Say 'No' to Bullying"]
+                        },
+                        {
+                            title: "Unit Ten: Lifestyle",
+                            lessons: ["Lesson 1: Manners around the World", "Lesson 2: Etiquette Netiquette", "Lesson 3: Food and Culture", "Lesson 4: Fitness", "Lesson 5: Consumerism"]
+                        },
+                        {
+                            title: "Unit Eleven: Peace and Conflict",
+                            lessons: ["Lesson 1: Situations of Conflict", "Lesson 2: \"The Old Man at the Bridge\" by Ernest Hemingway", "Lesson 3: Stories From Gaza", "Lesson 4: Peace in Literature", "Lesson 5: Opinions through images"]
+                        },
+                        {
+                            title: "Unit Twelve: Environment and Nature",
+                            lessons: ["Lesson 1: Water, Water Everywhere...", "Lesson 2: The Greta Effect", "Lesson 3: Endangered Species", "Lesson 4: What is Environmental Justice?", "Lesson 5: Limits of the Scientific Method"]
+                        }
+                    ],
+                    2: [
+                        "Grammar: Articles", "Grammar: Prepositions", "Grammar: Phrases and Idioms", "Grammar: Completing Sentences", "Grammar: Right forms of verbs", 
+                        "Grammar: Transformation of sentences", "Grammar: Narration", "Grammar: Pronoun Reference", "Grammar: Modifiers", "Grammar: Connectors", 
+                        "Grammar: Synonym & Antonym", "Grammar: Punctuation", "Composition: Formal Letter / Email", "Composition: Report Writing", "Composition: Paragraph", "Composition: Essay"
+                    ]
+                }
+            },
+            ict: {
+                name: "আইসিটি",
+                papers: {
+                    1: [
+                        "অধ্যায় ০১: তথ্য ও যোগাযোগ প্রযুক্তি: বিশ্ব ও বাংলাদেশ প্রেক্ষিত",
+                        "অধ্যায় ০২: কমিউনিকেশন সিস্টেমস ও নেটওয়ার্কিং",
+                        "অধ্যায় ০৩: সংখ্যা পদ্ধতি ও ডিজিটাল ডিভাইস",
+                        "অধ্যায় ০৪: ওয়েব ডিজাইন পরিচিতি এবং HTML",
+                        "অধ্যায় ০৫: প্রোগ্রামিং ভাষা",
+                        "অধ্যায় ০৬: ডেটাবেজ ম্যানেজমেন্ট সিস্টেম"
+                    ],
+                    2: ["আইসিটি বিষয়ে সাধারণত আলাদা ২য় পত্র নেই"]
+                }
+            },
+            logic: { 
+                name: "যুক্তিবিদ্যা", 
+                papers: { 
+                    1: [
+                        "অধ্যায় ০১: যুক্তিবিদ্যার পরিচিতি", 
+                        "অধ্যায় ০২: যুক্তিবিদ্যার প্রায়োগিক দিক", 
+                        "অধ্যায় ০৩: যুক্তির উপাদান", 
+                        "অধ্যায় ০৪: বিধেয়ক", 
+                        "অধ্যায় ০৫: অনুমান", 
+                        "অধ্যায় ০৬: অবরোহ অনুমান", 
+                        "অধ্যায় ০৭: আরোহ অনুমান ও আরোহ অনুমানের ভিত্তি", 
+                        "অধ্যায় ০৮: প্রতীকী যুক্তিবিদ্যা"
+                    ], 
+                    2: [
+                        "অধ্যায় ০১: যৌক্তিক সংজ্ঞা (Logical Definition)", 
+                        "অধ্যায় ০২: যৌক্তিক বিভাগ (Logical Division)", 
+                        "অধ্যায় ০৩: আরোহের প্রকারভেদ (Classification of Induction)", 
+                        "অধ্যায় ০৪: প্রকল্প (Hypothesis)", 
+                        "অধ্যায় ০৫: কার্যকারণ সম্পর্ক প্রমাণ পদ্ধতি (Method of Causation Relation Proof)", 
+                        "অধ্যায় ০৬: ব্যাখ্যা (Explanation)", 
+                        "অধ্যায় ০৭: শ্রেণীকরণ (Classification)", 
+                        "অধ্যায় ০৮: সম্ভাবনা (Probability)"
+                    ] 
+                } 
+            },
+            economics: {
+                name: "অর্থনীতি",
+                papers: {
+                    1: [
+                        "অধ্যায় ০১: মৌলিক অর্থনৈতিক সমস্যা",
+                        "অধ্যায় ০২: ভোক্তা ও উৎপাদকের আচরণ",
+                        "অধ্যায় ০৩: উৎপাদন, উৎপাদন ব্যয় ও আয়",
+                        "অধ্যায় ০৪: বাজার",
+                        "অধ্যায় ০৫: শ্রমবাজার",
+                        "অধ্যায় ০৬: মূলধন",
+                        "অধ্যায় ০৭: সংগঠন",
+                        "অধ্যায় ০৮: খাজনা",
+                        "অধ্যায় ০৯: সামগ্রিক আয় ও ব্যয়",
+                        "অধ্যায় ১০: মুদ্রা ও ব্যাংক"
+                    ],
+                    2: [
+                        "অধ্যায় ০১: বাংলাদেশের অর্থনীতি পরিচয়",
+                        "অধ্যায় ০২: বাংলাদেশের কৃষি",
+                        "অধ্যায় ০৩: বাংলাদেশের শিল্প",
+                        "অধ্যায় ০৪: জনসংখ্যা, মানবসম্পদ",
+                        "অধ্যায় ০৫: খাদ্য নিরাপত্তা",
+                        "অধ্যায় ০৬: অর্থায়ন",
+                        "অধ্যায় ০৭: মুদ্রাস্ফীতি",
+                        "অধ্যায় ০৮: আন্তর্জাতিক বাণিজ্য",
+                        "অধ্যায় ০৯: সরকারি অর্থব্যবস্থা",
+                        "অধ্যায় ১০: উন্নয়ন পরিকল্পনা"
+                    ]
+                }
+            },
+            civics: {
+                name: "পৌরনীতি ও সুশাসন",
+                papers: {
+                    1: [
+                        "অধ্যায় ০১: পৌরনীতি ও সুশাসন পরিচিতি",
+                        "অধ্যায় ০২: সুশাসন",
+                        "অধ্যায় ০৩: মূল্যবোধ, আইন, স্বাধীনতা ও সাম্য",
+                        "অধ্যায় ০৪: ই-গভর্নেন্স ও সুশাসন",
+                        "অধ্যায় ০৫: কর্তব্য ও মানবাধিকার",
+                        "অধ্যায় ০৬: রাজনৈতিক দল, নেতৃত্ব ও সুশাসন",
+                        "অধ্যায় ০৭: সরকার কাঠামো ও সরকারের অঙ্গসমূহ",
+                        "অধ্যায় ০৮: জনমত ও রাজনৈতিক সংস্কৃতি",
+                        "অধ্যায় ০৯: জনসেবা ও আমলাতন্ত্র",
+                        "অধ্যায় ১০: দেশ প্রেম ও জাতীয়তা"
+                    ],
+                    2: [
+                        "অধ্যায় ০১: ব্রিটিশ ভারতে প্রতিনিধিত্বশীল",
+                        "অধ্যায় ০২: পাকিস্তান থেকে বাংলাদেশ",
+                        "অধ্যায় ০৩: বাংলাদেশের স্বাধীনতা লাভ",
+                        "অধ্যায় ০৪: বাংলাদেশের সংবিধান",
+                        "অধ্যায় ০৫: সরকার ও প্রশাসনিক কাঠামো",
+                        "অধ্যায় ০৬: স্থানীয় শাসন",
+                        "অধ্যায় ০৭: সাংবিধানিক প্রতিষ্ঠান",
+                        "অধ্যায় ০৮: বাংলাদেশের নির্বাচন ব্যবস্থা",
+                        "অধ্যায় ০৯: বাংলাদেশের বৈদেশিক নীতি",
+                        "অধ্যায় ১০: নাগরিক সমস্যা ও আমাদের করণীয়"
+                    ]
+                }
+            },
+            sociology: {
+                name: "সমাজবিজ্ঞান",
+                papers: {
+                    1: [
+                        "অধ্যায় ০১: সমাজবিজ্ঞানের উৎপত্তি ও বিকাশ",
+                        "অধ্যায় ০২: সমাজবিজ্ঞানের বৈজ্ঞানিক মর্যাদা",
+                        "অধ্যায় ০৩: সমাজবিজ্ঞানীদের মতবাদ ও অবদান",
+                        "অধ্যায় ০৪: সমাজবিজ্ঞানের মৌল প্রত্যয়",
+                        "অধ্যায় ০৫: সামাজিক প্রতিষ্ঠান",
+                        "অধ্যায় ০৬: সমাজজীবনে প্রভাববিস্তারকারী উপাদান",
+                        "অধ্যায় ০৭: সামাজিকীকরণ প্রক্রিয়া",
+                        "অধ্যায় ০৮: সামাজিক স্তরবিন্যাস ও অসমতা",
+                        "অধ্যায় ০৯: সামাজিক ব্যবস্থা",
+                        "অধ্যায় ১০: বিচ্যুতিমূলক আচরণ এবং অপরাধ",
+                        "অধ্যায় ১১: সামাজিক পরিবর্তন"
+                    ],
+                    2: [
+                        "অধ্যায় ০১: বাংলাদেশে সমাজবিজ্ঞান চর্চার বিকাশ",
+                        "অধ্যায় ০২: বাংলাদেশের সমাজ ও সংস্কৃতি",
+                        "অধ্যায় ০৩: বাংলাদেশের সমাজ ও সভ্যতা",
+                        "অধ্যায় ০৪: বাংলাদেশের ক্ষুদ্র নৃগোষ্ঠীর জীবনধারা",
+                        "অধ্যায় ০৫: বাংলাদেশের অভ্যুদয়ের সামাজিক প্রেক্ষাপট",
+                        "অধ্যায় ০৬: বাংলাদেশের গ্রামীণ ও শহরে সমাজ",
+                        "অধ্যায় ০৭: বিবাহ, পরিবার ও জ্ঞাতি সম্পর্ক",
+                        "অধ্যায় ০৮: বাংলাদেশে সামাজিক পরিবর্তন",
+                        "অধ্যায় ০৯: সামাজিক সমস্যা ও প্রতিকারের উপায়",
+                        "অধ্যায় ১০: বাংলাদেশের সামাজিক উন্নয়ন"
+                    ]
+                }
+            }
+        };
+
+        let currentSubject = 'bangla'; 
+        let currentPaper = 1;
+
+        function initTracker() {
+            updateUI();
+            renderList();
+        }
+
+        function selectSubject(sub) {
+            currentSubject = sub;
+            currentPaper = 1; 
+            updateUI();
+            renderList();
+        }
+
+        function selectPaper(paper) {
+            currentPaper = paper;
+            updateUI();
+            renderList();
+        }
+
+        function updateUI() {
+            const subjects = ['bangla', 'english', 'ict', 'logic', 'economics', 'civics', 'sociology'];
+            subjects.forEach(sub => {
+                const btn = document.getElementById(`btn-${sub}`);
+                if (sub === currentSubject) {
+                    btn.className = "subject-btn p-4 rounded-xl bg-blue-600 border-2 border-blue-500 text-center shadow-lg transition text-white cursor-pointer transform scale-[1.02]";
+                } else {
+                    btn.className = "subject-btn p-4 rounded-xl bg-slate-800 border-2 border-slate-700 text-center shadow-lg transition hover:bg-slate-700 cursor-pointer text-slate-400 hover:text-slate-200";
+                }
+            });
+
+            const paperTabsContainer = document.getElementById('paper-tabs-container');
+            const paperLabel = document.getElementById('section-paper-label');
+            
+            if (currentSubject === 'ict') {
+                paperTabsContainer.classList.add('hidden');
+                paperTabsContainer.classList.remove('flex');
+                paperLabel.classList.add('hidden');
+            } else {
+                paperTabsContainer.classList.remove('hidden');
+                paperTabsContainer.classList.add('flex');
+                paperLabel.classList.remove('hidden');
+            }
+
+            const tab1 = document.getElementById('tab-1');
+            const tab2 = document.getElementById('tab-2');
+            
+            const activeTabClass = "flex-1 py-2 px-4 rounded-lg bg-blue-600 text-white font-medium shadow-lg transition text-sm";
+            const inactiveTabClass = "flex-1 py-2 px-4 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 transition text-sm hover:bg-slate-700";
+
+            tab1.className = currentPaper === 1 ? activeTabClass : inactiveTabClass;
+            tab2.className = currentPaper === 2 ? activeTabClass : inactiveTabClass;
+
+            const subName = syllabusData[currentSubject].name;
+            document.getElementById('section-title').innerText = subName;
+            document.getElementById('section-paper-label').innerText = currentPaper === 1 ? "1st Paper" : "2nd Paper";
+        }
+
+        function getStorageKey(chapterName) {
+            // Note: Now key does NOT include username here, because we select the user-specific object 'progressData' first.
+            // The object 'progressData' is already unique to the user.
+            return `${currentSubject}_p${currentPaper}_${chapterName.replace(/\s/g, '')}`;
+        }
+
+        function toggleMain(chapterName) {
+            const key = getStorageKey(chapterName);
+            if (!progressData[key]) progressData[key] = { main: false, k: false, kh: false, g: false, gh: false, mcq: false };
+            progressData[key].main = !progressData[key].main;
+            saveAndRender();
+        }
+
+        function toggleSub(chapterName, subType) {
+            const key = getStorageKey(chapterName);
+            if (!progressData[key]) progressData[key] = { main: false, k: false, kh: false, g: false, gh: false, mcq: false };
+            progressData[key][subType] = !progressData[key][subType];
+            saveAndRender();
+        }
+
+        function markAll(status) {
+            if(status === false && !confirm("আপনি কি নিশ্চিত যে আপনি এই পেপারের সব প্রোগ্রেস মুছে ফেলতে চান?")) return;
+            const chapters = syllabusData[currentSubject].papers[currentPaper];
+            chapters.forEach(chap => {
+                if(typeof chap === 'string' && chap.startsWith('SECTION:')) return;
+                const chapterName = typeof chap === 'string' ? chap : chap.title;
+                const key = getStorageKey(chapterName);
+                if (typeof chap === 'string') {
+                    progressData[key] = { main: status, k: status, kh: status, g: status, gh: status, mcq: status };
+                } else {
+                    const newData = { main: status };
+                    chap.lessons.forEach((_, index) => { newData[index] = status; });
+                    progressData[key] = newData;
+                }
+            });
+            saveAndRender();
+        }
+
+        function saveAndRender() {
+            const storageKey = `syllabusTrackerData_${currentUser}`;
+            localStorage.setItem(storageKey, JSON.stringify(progressData));
+            renderList();
+        }
+
+        function renderList() {
+            const listContainer = document.getElementById('chapter-list');
+            listContainer.innerHTML = '';
+            
+            const chapters = syllabusData[currentSubject].papers[currentPaper] || [];
+            
+            let totalPoints = 0;
+            let earnedPoints = 0;
+            let completedChaptersCount = 0;
+            let actualChapterCount = 0; 
+
+            chapters.forEach(chapter => {
+                if (typeof chapter === 'string' && chapter.startsWith('SECTION:')) {
+                    const header = document.createElement('h3');
+                    header.className = "text-xl font-bold text-blue-400 mt-6 mb-3 border-b border-slate-700 pb-2 pl-1 font-montserrat tracking-wide";
+                    header.innerText = chapter.replace('SECTION:', '');
+                    listContainer.appendChild(header);
+                    return; 
+                }
+
+                actualChapterCount++;
+                const isComplex = typeof chapter === 'object';
+                const chapterTitle = isComplex ? chapter.title : chapter;
+                const key = getStorageKey(chapterTitle);
+                const data = progressData[key] || { main: false, k: false, kh: false, g: false, gh: false, mcq: false };
+
+                let weightMain = 25; // Adjusted weight for main check
+                let chapterEarned = 0;
+                let chapterTotal = 100;
+
+                if (isComplex) {
+                    weightMain = 40; // Maintain old weight for English 1st
+                    const lessonCount = chapter.lessons.length;
+                    const weightPerLesson = 60 / lessonCount;
+                    if(data.main) chapterEarned += weightMain;
+                    chapter.lessons.forEach((_, index) => { if(data[index]) chapterEarned += weightPerLesson; });
+                } else {
+                    const weightSub = 15; // 5 subs * 15 = 75
+                    chapterTotal = weightMain + (weightSub * 5); // 25 + 75 = 100
+                    if(data.main) chapterEarned += weightMain;
+                    if(data.k) chapterEarned += weightSub;
+                    if(data.kh) chapterEarned += weightSub;
+                    if(data.g) chapterEarned += weightSub;
+                    if(data.gh) chapterEarned += weightSub;
+                    if(data.mcq) chapterEarned += weightSub;
+                }
+
+                const isComplete = Math.abs(chapterEarned - chapterTotal) < 0.1;
+                if(isComplete) completedChaptersCount++;
+                totalPoints += chapterTotal;
+                earnedPoints += chapterEarned;
+
+                const card = document.createElement('div');
+                card.className = `bg-slate-800 p-4 rounded-xl border ${isComplete ? 'border-green-500/50 shadow-green-900/20' : 'border-slate-700'} shadow-sm flex flex-col gap-4 transition hover:border-slate-600`;
+
+                let subContentHtml = '';
+                if (isComplex) {
+                    subContentHtml = `<div class="flex flex-col gap-2 mt-2">`;
+                    chapter.lessons.forEach((lesson, index) => {
+                        const isChecked = data[index] || false;
+                        subContentHtml += `
+                            <label class="flex items-center gap-3 p-2 rounded-lg bg-slate-900/50 border border-slate-700/50 cursor-pointer hover:bg-slate-700 transition group">
+                                <input type="checkbox" class="lesson-checkbox sr-only" ${isChecked ? 'checked' : ''} onchange="toggleSub('${chapterTitle}', '${index}')">
+                                <div class="w-5 h-5 border-2 border-slate-500 rounded bg-slate-800 flex items-center justify-center transition-all group-hover:border-blue-400">
+                                    <svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                                <span class="text-sm text-slate-300 font-medium select-none group-hover:text-white">${lesson}</span>
+                            </label>
+                        `;
+                    });
+                    subContentHtml += `</div>`;
+                } else {
+                    subContentHtml = `
+                        <div class="flex flex-wrap gap-2">
+                            ${renderSubBox(chapterTitle, 'k', 'ক', data.k)}
+                            ${renderSubBox(chapterTitle, 'kh', 'খ', data.kh)}
+                            ${renderSubBox(chapterTitle, 'g', 'গ', data.g)}
+                            ${renderSubBox(chapterTitle, 'gh', 'ঘ', data.gh)}
+                            ${renderSubBox(chapterTitle, 'mcq', 'MCQ', data.mcq)}
+                        </div>
+                    `;
+                }
+                
+                card.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <label class="checkbox-wrapper cursor-pointer relative mt-1">
+                            <input type="checkbox" class="peer sr-only" ${data.main ? 'checked' : ''} onchange="toggleMain('${chapterTitle}')">
+                            <div class="w-6 h-6 border-2 border-slate-500 rounded bg-slate-900 transition-all peer-checked:bg-blue-600 peer-checked:border-blue-600 flex items-center justify-center shadow-inner">
+                                <svg class="w-4 h-4 text-white ${data.main ? 'block' : 'hidden'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                        </label>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-gray-200 font-medium text-lg leading-tight mb-3 select-none ${isComplete ? 'text-green-400' : ''}">${chapterTitle}</h3>
+                                ${isComplete ? '<span class="text-xs bg-green-600/20 text-green-400 px-2 py-0.5 rounded border border-green-600/30">সম্পন্ন</span>' : ''}
+                            </div>
+                            ${subContentHtml}
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+
+            const percentage = totalPoints === 0 ? 0 : Math.round((earnedPoints / totalPoints) * 100);
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = `${percentage}%`;
+            
+            if(percentage === 100) {
+                progressBar.classList.remove('from-blue-500', 'to-cyan-400');
+                progressBar.classList.add('bg-green-500');
+            } else {
+                progressBar.classList.add('from-blue-500', 'to-cyan-400');
+                progressBar.classList.remove('bg-green-500');
+            }
+
+            document.getElementById('completed-count').innerText = `${completedChaptersCount} / ${actualChapterCount}`;
+        }
+
+        function renderSubBox(chapter, type, label, isChecked) {
+            const activeClass = "bg-blue-600 border-blue-600 text-white";
+            const inactiveClass = "border-slate-600 bg-slate-800 text-slate-400 hover:border-blue-500 hover:text-blue-400";
+            // Make MCQ button slightly wider
+            const widthClass = label === 'MCQ' ? 'w-auto px-2' : 'w-8';
+            
+            return `
+            <label class="cursor-pointer group">
+                <input type="checkbox" class="sub-checkbox sr-only" ${isChecked ? 'checked' : ''} onchange="toggleSub('${chapter}', '${type}')">
+                <div class="${widthClass} h-8 flex items-center justify-center rounded border text-sm font-bold transition-all select-none ${isChecked ? activeClass : inactiveClass}">
+                    ${label}
+                </div>
+            </label>
+            `;
+        }
+
+        // Initialize App
+        checkAuth();
+
+    </script>
+</body>
+</html>
